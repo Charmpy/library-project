@@ -145,6 +145,7 @@ class GiveWidget(QWidget):
         self.change_info(info)
         show_tbl(self.table, info, head)
         self.give_btn.clicked.connect(self.give_dialog)
+        self.get_btn.clicked.connect(self.back_dialog)
 
     def change_info(self, info):
         for i in info:
@@ -159,6 +160,19 @@ class GiveWidget(QWidget):
 
         self.d = QDialog()
         uic.loadUi('give_give_dialog.ui', self.d)
+        self.d.show()
+        self.d.cancel_btn.clicked.connect(close)
+        self.d.ok_btn.clicked.connect(check)
+
+    def back_dialog(self):
+        def close():
+            self.d.close()
+
+        def check():
+            self.d.close()
+
+        self.d = QDialog()
+        uic.loadUi('give_back_dialog.ui', self.d)
         self.d.show()
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
@@ -178,6 +192,8 @@ class UsersWidget(QWidget):
         info = self.root.data.get_readers(False)
         self.change_info(info)
         show_tbl(self.table, info, head)
+        self.add_b.clicked.connect(self.add_dialog)
+        self.change_b.clicked.connect(self.change_dialog)
 
     def change_info(self, info):
         for i in info:
@@ -185,6 +201,33 @@ class UsersWidget(QWidget):
                 i[-1] = self.root.data.get_bookinfo(i[-1])
             else:
                 i[-1] = 'Нет'
+
+    def add_dialog(self):
+        def close():
+            self.d.close()
+
+        def check():
+            self.d.close()
+
+        self.d = QDialog()
+        uic.loadUi('users_add_dialog.ui', self.d)
+        self.d.show()
+        self.d.cancel_btn.clicked.connect(close)
+        self.d.ok_btn.clicked.connect(check)
+
+    def change_dialog(self):
+        def close():
+            self.d.close()
+
+        def check():
+            self.d.close()
+
+        self.d = QDialog()
+        uic.loadUi('users_change_dialog.ui', self.d)
+        self.d.show()
+        self.d.cancel_btn.clicked.connect(close)
+        self.d.ok_btn.clicked.connect(check)
+
 
 
 def show_tbl(table, info, head):
