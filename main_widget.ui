@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>521</width>
+    <width>600</width>
     <height>352</height>
    </rect>
   </property>
@@ -244,7 +244,7 @@ border-image: url(:/newPrefix/wallpaper.png);
           <cursorShape>PointingHandCursor</cursorShape>
          </property>
          <property name="text">
-          <string>ПОИСК КНИГ</string>
+          <string>Каталог</string>
          </property>
         </widget>
        </item>

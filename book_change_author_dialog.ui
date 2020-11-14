@@ -30,17 +30,11 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <pointsize>15</pointsize>
+       <pointsize>16</pointsize>
       </font>
      </property>
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
      <property name="text">
-      <string>Добавление новой книги</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <string>Редактирование информации о авторе</string>
      </property>
     </widget>
    </item>
@@ -52,86 +46,27 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>20</height>
+       <height>40</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetFixedSize</enum>
-     </property>
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Жанр</string>
-       </property>
-      </widget>
-     </item>
+    <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="label_2">
        <property name="font">
         <font>
-         <family>Arial</family>
          <pointsize>10</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Название</string>
+        <string>ФИО</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Автор</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Год написания</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" colspan="2">
+     <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit"/>
-     </item>
-     <item row="3" column="1" colspan="2">
-      <widget class="QLineEdit" name="lineEdit_3">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="2">
-      <widget class="QComboBox" name="comboBox"/>
-     </item>
-     <item row="2" column="1" colspan="2">
-      <widget class="QComboBox" name="comboBox_2"/>
      </item>
     </layout>
    </item>
@@ -166,7 +101,7 @@
      <item>
       <widget class="QPushButton" name="ok_btn">
        <property name="text">
-        <string>Добавить</string>
+        <string>Изменить</string>
        </property>
       </widget>
      </item>

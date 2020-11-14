@@ -95,15 +95,20 @@ class BookWidget(QWidget):
         info = self.root.data.get_books('123')
         self.change_info(info)
         show_tbl(self.table, info, head)
-        self.add_b.clicked.connect(self.add_dialog)
-        self.change_b.clicked.connect(self.change_dialog)
+        self.add_book_btn.clicked.connect(self.add_book_dialog)
+        self.add_author_btn.clicked.connect(self.add_author_dialog)
+        self.add_genre_btn.clicked.connect(self.add_genre_dialog)
+
+        self.change_book_btn.clicked.connect(self.change_book_dialog)
+        self.change_author_btn.clicked.connect(self.change_author_dialog)
+        self.change_genre_btn.clicked.connect(self.change_genre_dialog)
 
     def change_info(self, info):
         for i in info:
             i[2] = self.root.data.get_authorname(i[2])
             i[3] = self.root.data.get_genrename(i[3])
 
-    def add_dialog(self):
+    def add_book_dialog(self):
         def close():
             self.d.close()
 
@@ -116,7 +121,33 @@ class BookWidget(QWidget):
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
 
-    def change_dialog(self):
+    def add_author_dialog(self):
+        def close():
+            self.d.close()
+
+        def check():
+            self.d.close()
+
+        self.d = QDialog()
+        uic.loadUi('book_add_author_dialog.ui', self.d)
+        self.d.show()
+        self.d.cancel_btn.clicked.connect(close)
+        self.d.ok_btn.clicked.connect(check)
+
+    def add_genre_dialog(self):
+        def close():
+            self.d.close()
+
+        def check():
+            self.d.close()
+
+        self.d = QDialog()
+        uic.loadUi('book_add_genre_dialog.ui', self.d)
+        self.d.show()
+        self.d.cancel_btn.clicked.connect(close)
+        self.d.ok_btn.clicked.connect(check)
+
+    def change_book_dialog(self):
         def close():
             self.d.close()
 
@@ -125,6 +156,32 @@ class BookWidget(QWidget):
 
         self.d = QDialog()
         uic.loadUi('book_change_dialog.ui', self.d)
+        self.d.show()
+        self.d.cancel_btn.clicked.connect(close)
+        self.d.ok_btn.clicked.connect(check)
+
+    def change_author_dialog(self):
+        def close():
+            self.d.close()
+
+        def check():
+            self.d.close()
+
+        self.d = QDialog()
+        uic.loadUi('book_change_author_dialog.ui', self.d)
+        self.d.show()
+        self.d.cancel_btn.clicked.connect(close)
+        self.d.ok_btn.clicked.connect(check)
+
+    def change_genre_dialog(self):
+        def close():
+            self.d.close()
+
+        def check():
+            self.d.close()
+
+        self.d = QDialog()
+        uic.loadUi('book_change_genre_dialog.ui', self.d)
         self.d.show()
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
