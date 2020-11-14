@@ -286,7 +286,6 @@ class UsersWidget(QWidget):
         self.d.ok_btn.clicked.connect(check)
 
 
-
 def show_tbl(table, info, head):
     table.setRowCount(len(info))
     table.setColumnCount(len(head))
