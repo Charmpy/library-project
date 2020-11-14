@@ -118,20 +118,20 @@
       </widget>
      </item>
      <item row="0" column="1" colspan="2">
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="title_in"/>
      </item>
      <item row="3" column="1" colspan="2">
-      <widget class="QLineEdit" name="lineEdit_3">
+      <widget class="QLineEdit" name="year_in">
        <property name="enabled">
         <bool>true</bool>
        </property>
       </widget>
      </item>
      <item row="1" column="1" colspan="2">
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="author_combo"/>
      </item>
      <item row="2" column="1" colspan="2">
-      <widget class="QComboBox" name="comboBox_2"/>
+      <widget class="QComboBox" name="genre_combo"/>
      </item>
     </layout>
    </item>

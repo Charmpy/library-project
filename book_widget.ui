@@ -116,7 +116,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTableWidget" name="table"/>
+          <widget class="QTableWidget" name="book_tbl"/>
          </item>
         </layout>
        </item>
@@ -216,7 +216,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="tableWidget"/>
+        <widget class="QTableWidget" name="author_tbl"/>
        </item>
       </layout>
      </widget>
@@ -291,7 +291,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="tableWidget_2"/>
+        <widget class="QTableWidget" name="genre_tbl"/>
        </item>
       </layout>
      </widget>
