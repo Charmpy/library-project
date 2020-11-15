@@ -10,7 +10,24 @@ class Data:
         self.con = sqlite3.connect('library_db.db')
         self.cur = self.con.cursor()
 
-    def get_books(self, str, **kwargs):
+    def find_authors(self, line):
+        rez = self.cur.execute(
+            '''
+            SELECT * FROM authors
+            WHERE name LIKE ?
+            ''', (f'%{line}%',)).fetchall()
+        return [list(i) for i in rez]
+
+    def find_genres(self, line):
+        rez = self.cur.execute(
+            '''
+            SELECT * FROM genres
+            WHERE genre LIKE ?
+            ''', (f'%{line}%',)).fetchall()
+        return [list(i) for i in rez]
+
+    def get_books(self, head='', line=''):
+        print(head, line)
         rez = self.cur.execute('''
         SELECT * FROM books
         WHERE id > 0
@@ -68,9 +85,55 @@ class Data:
 
     def add_book(self, title, author, genre, year):
         ide = self.cur.execute("select max(id) from books").fetchall()[0][0] + 1
+        self.cur.execute(
+            '''
+                INSERT INTO books(id, title, author, genre, year) VALUES(
+                ?, ?, 
+                (SELECT id FROM authors WHERE name LIKE ?), 
+                (SELECT id FROM genres WHERE genre LIKE ?), 
+                ?
+                ) 
+            ''', (ide, title, author, genre, year, ))
+
+    def add_author(self, name):
+        ide = self.cur.execute("select max(id) from authors").fetchall()[0][0] + 1
+        self.cur.execute(
+            '''
+                INSERT INTO authors(id, name) VALUES(?, ?) 
+            ''', (ide, name,))
+
+    def add_genre(self, genre):
+        ide = self.cur.execute("select max(id) from genres").fetchall()[0][0] + 1
+        self.cur.execute(
+            '''
+                INSERT INTO genres(id, genre) VALUES(?, ?) 
+            ''', (ide, genre,))
+
+    def change_book(self, index, title, author, genre, year):
         self.cur.execute('''
-                            INSERT INTO books(id, title, author, genre, year) VALUES(?, ?, ?, ?, ?) 
-                            ''', (ide, title, author, genre, year, ))
+                UPDATE books
+                SET title = ?, 
+                author = (SELECT id FROM authors WHERE name LIKE ?),
+                genre = (SELECT id FROM genres WHERE genre LIKE ?), 
+                year = ?
+                WHERE id = ?
+            ''', (title, author, genre, year, index,))
+
+    def change_author(self, index, name):
+        self.cur.execute(
+            '''
+                UPDATE authors
+                SET name = ?
+                WHERE id = ?
+            ''', (name, index,))
+
+    def change_genre(self, index, genre):
+        self.cur.execute(
+            '''
+                UPDATE genres
+                SET genre = ?
+                WHERE id = ?
+            ''', (genre, index,))
 
 
 class Main(QWidget):
@@ -101,6 +164,9 @@ class Main(QWidget):
 
 class BookWidget(QWidget):
     def __init__(self, root):
+        self.selected_book_info = None
+        self.selected_author_info = None
+        self.selected_genre_info = None
         super().__init__()
         self.root = root
         self.initUI()
@@ -110,21 +176,39 @@ class BookWidget(QWidget):
         self.back.clicked.connect(lambda x: self.root.widget.setCurrentIndex(0))
 
         self.book_tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.author_tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.genre_tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.author_tbl.horizontalHeader().setStretchLastSection(True)
+        self.genre_tbl.horizontalHeader().setStretchLastSection(True)
         self.refresh_tables()
+
+        self.find_param = ['id', 'Название', 'Автор', 'Жанр', 'Год']
+        self.find_combo.addItems(self.find_param)
+        self.find_combo.currentIndexChanged.connect(self.refresh_tables)
+        self.find_in.textChanged.connect(self.refresh_tables)
 
         self.add_book_btn.clicked.connect(self.add_book_dialog)
         self.add_author_btn.clicked.connect(self.add_author_dialog)
         self.add_genre_btn.clicked.connect(self.add_genre_dialog)
 
-        self.change_book_btn.clicked.connect(self.change_book_dialog)
-        self.change_author_btn.clicked.connect(self.change_author_dialog)
-        self.change_genre_btn.clicked.connect(self.change_genre_dialog)
+        self.book_tbl.cellDoubleClicked.connect(self.change_book_coords)
+        self.author_tbl.cellDoubleClicked.connect(self.change_author_coords)
+        self.genre_tbl.cellDoubleClicked.connect(self.change_genre_coords)
+
+    def change_book_coords(self, row, col):
+        selected_book_info = [self.book_tbl.item(row, i).text() for i in range(5)]
+        self.change_book_dialog(selected_book_info)
+
+    def change_author_coords(self, row, col):
+        selected_author_info = [self.author_tbl.item(row, i).text() for i in range(2)]
+        self.change_author_dialog(selected_author_info)
+
+    def change_genre_coords(self, row, col):
+        selected_genre_info = [self.genre_tbl.item(row, i).text() for i in range(2)]
+        self.change_genre_dialog(selected_genre_info)
 
     def refresh_tables(self):
+        book_list = self.root.data.get_books(self.find_combo.currentIndex(), self.find_in.text())
+
         book_head = ['id', 'Название', 'Автор', 'Жанр', 'Год']
-        book_list = self.root.data.get_books('123')
         self.change_book_list(book_list)
         show_tbl(self.book_tbl, book_list, book_head)
 
@@ -147,25 +231,23 @@ class BookWidget(QWidget):
 
         def check():
             t = self.d.title_in.text()
-            a = self.d.author_combo.currentIndex() + 1
-            g = self.d.genre_combo.currentIndex() + 1
+            a = self.d.author_combo.currentText()
+            g = self.d.genre_combo.currentText()
             y = self.d.year_in.text()
-            msg = QMessageBox(self.d)
             if bool(t) and bool(y) and bool(a) and bool(g):
                 try:
                     y = int(y)
                 except ValueError:
-                    msg.question(self, '', 'Неверный год', msg.Ok)
-
+                    self.d.error.setText('Неверный год')
                 else:
                     if 0 < y <= 2020:
                         self.root.data.add_book(t, a, g, y)
                         self.refresh_tables()
                         self.d.close()
                     else:
-                        msg.question(self, '', 'Неверный год', msg.Ok)
+                        self.d.error.setText('Неверный год')
             else:
-                msg.question(self, '', 'Не все поля заполнены', msg.Ok)
+                self.d.error.setText('Не все поля заполнены')
 
         self.d = QDialog()
         uic.loadUi('book_add_dialog.ui', self.d)
@@ -182,63 +264,139 @@ class BookWidget(QWidget):
             self.d.close()
 
         def check():
-            self.d.close()
+            n = self.d.name_in.text()
+            if bool(n):
+                if bool(self.root.data.find_authors(n)):
+                    self.d.error.setText('Такой автор уже существует')
+                else:
+                    self.root.data.add_author(n)
+                    self.refresh_tables()
+                    self.d.close()
+            else:
+                self.d.error.setText('Заполните поле')
+
+        def update_tbl(line):
+            info = self.root.data.find_authors(line)
+            show_tbl(self.d.author_tbl, info, ['id', 'Автор'])
 
         self.d = QDialog()
         uic.loadUi('book_add_author_dialog.ui', self.d)
         self.d.show()
+        self.d.author_tbl.horizontalHeader().setStretchLastSection(True)
+        update_tbl('')
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
+        self.d.name_in.textChanged.connect(update_tbl)
 
     def add_genre_dialog(self):
         def close():
             self.d.close()
 
         def check():
-            self.d.close()
+            g = self.d.genre_in.text()
+            if bool(g):
+                if bool(self.root.data.find_genres(g)):
+                    self.d.error.setText('Такой жанр уже существует')
+                else:
+                    self.root.data.add_genre(g)
+                    self.refresh_tables()
+                    self.d.close()
+            else:
+                self.d.error.setText('Заполните поле')
+
+        def update_tbl(line):
+            info = self.root.data.find_genres(line)
+            show_tbl(self.d.genre_tbl, info, ['id', 'Жанр'])
 
         self.d = QDialog()
         uic.loadUi('book_add_genre_dialog.ui', self.d)
         self.d.show()
+        self.d.genre_tbl.horizontalHeader().setStretchLastSection(True)
+        update_tbl('')
+        self.d.genre_in.textChanged.connect(update_tbl)
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
 
-    def change_book_dialog(self):
+    def change_book_dialog(self, info):
         def close():
             self.d.close()
 
         def check():
-            self.d.close()
-
+            index = info[0]
+            t = self.d.title_in.text()
+            a = self.d.author_combo.currentText()
+            g = self.d.genre_combo.currentText()
+            y = self.d.year_in.text()
+            if bool(t) and bool(y) and bool(a) and bool(g):
+                try:
+                    y = int(y)
+                except ValueError:
+                    self.d.error.setText('Неверный год')
+                else:
+                    if 0 < y <= 2020:
+                        self.root.data.change_book(index, t, a, g, y)
+                        self.refresh_tables()
+                        self.d.close()
+                    else:
+                        self.d.error.setText('Неверный год')
+            else:
+                self.d.error.setText('Не все поля заполнены')
         self.d = QDialog()
         uic.loadUi('book_change_dialog.ui', self.d)
+
+        authors = [i[1] for i in self.root.data.get_authors()]
+        genres = [i[1] for i in self.root.data.get_genres()]
+        self.d.author_combo.addItems(authors)
+        self.d.genre_combo.addItems(genres)
+
+        self.d.title_in.setText(info[1])
+        self.d.author_combo.setCurrentText(authors[authors.index(info[2])])
+        self.d.genre_combo.setCurrentText(genres[genres.index(info[3])])
+        self.d.year_in.setText(info[4])
+
         self.d.show()
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
 
-    def change_author_dialog(self):
+    def change_author_dialog(self, info):
         def close():
             self.d.close()
 
         def check():
-            self.d.close()
+            index = info[0]
+            n = self.d.name_in.text()
+            if bool(n):
+                    self.root.data.change_author(index, n)
+                    self.refresh_tables()
+                    self.d.close()
+            else:
+                self.d.error.setText('Заполните поле')
 
         self.d = QDialog()
         uic.loadUi('book_change_author_dialog.ui', self.d)
         self.d.show()
+        self.d.name_in.setText(info[1])
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
 
-    def change_genre_dialog(self):
+    def change_genre_dialog(self, info):
         def close():
             self.d.close()
 
         def check():
-            self.d.close()
+            index = info[0]
+            g = self.d.genre_in.text()
+            if bool(g):
+                self.root.data.change_genre(index, g)
+                self.refresh_tables()
+                self.d.close()
+            else:
+                self.d.error.setText('Заполните поле')
 
         self.d = QDialog()
         uic.loadUi('book_change_genre_dialog.ui', self.d)
         self.d.show()
+        self.d.genre_in.setText(info[1])
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
 
