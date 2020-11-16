@@ -32,7 +32,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <property name="font">
@@ -104,13 +104,6 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QPushButton" name="delete_book_btn">
-             <property name="text">
-              <string>Удалить</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
          <item>
@@ -147,7 +140,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit"/>
+          <widget class="QLineEdit" name="find_author_in"/>
          </item>
         </layout>
        </item>
@@ -177,18 +170,6 @@
              </property>
              <property name="text">
               <string>Добавить</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="delete_author_btn">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Удалить</string>
              </property>
             </widget>
            </item>
@@ -245,18 +226,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QPushButton" name="delete_genre_btn">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Удалить</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
@@ -281,7 +250,7 @@
    <item>
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Для изменения информации 2 раза нажмите на необходимую ячейку</string>
+      <string>Для редактирования информации 2 раза нажмите на необходимую ячейку</string>
      </property>
     </widget>
    </item>

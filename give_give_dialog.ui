@@ -73,15 +73,25 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="name_in"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QTableView" name="table"/>
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Для выбора 2 раза нажмите на необходимого читателя </string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="name_tbl"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QLabel" name="label_3">
        <property name="sizePolicy">
@@ -119,7 +129,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QComboBox" name="comboBox"/>
+        <widget class="QComboBox" name="author_combo"/>
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="label_5">

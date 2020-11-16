@@ -27,11 +27,34 @@ class Data:
         return [list(i) for i in rez]
 
     def get_books(self, head='', line=''):
-        print(head, line)
-        rez = self.cur.execute('''
-        SELECT * FROM books
-        WHERE id > 0
-        ''').fetchall()
+        if head == -1:
+            head = 0
+        head = ['id', 'title', 'author', 'genre', 'year'][int(head)]
+        rez = self.cur.execute(
+            '''
+            SELECT * FROM books
+            WHERE id > 0
+            ''').fetchall()
+        if head == 'author':
+            rez = self.cur.execute(
+                '''SELECT * FROM books
+                    WHERE id > 0 AND author IN (SELECT id from authors WHERE name LIKE ?)
+                ''', (f'%{line}%', )).fetchall()
+        elif head == 'genre':
+            rez = self.cur.execute(
+                '''SELECT * FROM books
+                    WHERE id > 0 AND genre IN (SELECT id from genres WHERE genre LIKE ?)
+                ''', (f'%{line}%',)).fetchall()
+        elif head == 'title':
+            rez = self.cur.execute(
+                '''SELECT * FROM books
+                    WHERE id > 0 AND title LIKE ?
+                ''', (f'%{line}%',)).fetchall()
+        elif head == 'year':
+            rez = self.cur.execute(
+                '''SELECT * FROM books
+                    WHERE id > 0 AND year LIKE ?
+                ''', (f'{line}',)).fetchall()
         return [list(i) for i in rez]
 
     def get_authors(self):
@@ -135,6 +158,48 @@ class Data:
                 WHERE id = ?
             ''', (genre, index,))
 
+    def delete_book(self, index):
+        self.cur.execute('''
+        DELETE FROM books
+        WHERE id = ?''', (index, ))
+
+    def delete_author(self, index):
+        self.cur.execute(
+            '''
+            UPDATE books
+            SET author = 0
+            WHERE author = ?
+            ''', (index,))
+        self.cur.execute('''
+        DELETE FROM authors
+        WHERE id = ?''', (index, ))
+
+    def delete_genre(self, index):
+        self.cur.execute(
+            '''
+            UPDATE books
+            SET genre = 0
+            WHERE genre = ?
+            ''', (index,))
+        self.cur.execute('''
+        DELETE FROM genres
+        WHERE id = ?''', (index, ))
+
+    def find_users(self, line, flag=True):
+        if flag:
+            rez = self.cur.execute(
+                '''
+                SELECT * FROM users
+                WHERE name LIKE ? AND books = 0
+                ''', (f'%{line}%',)).fetchall()
+        else:
+            rez = self.cur.execute(
+                '''
+                SELECT * FROM users
+                WHERE name LIKE ?
+                ''', (f'%{line}%',)).fetchall()
+        return [list(i) for i in rez]
+
 
 class Main(QWidget):
     def __init__(self):
@@ -180,10 +245,11 @@ class BookWidget(QWidget):
         self.genre_tbl.horizontalHeader().setStretchLastSection(True)
         self.refresh_tables()
 
-        self.find_param = ['id', 'Название', 'Автор', 'Жанр', 'Год']
+        self.find_param = ['не указан', 'Название', 'Автор', 'Жанр', 'Год']
         self.find_combo.addItems(self.find_param)
         self.find_combo.currentIndexChanged.connect(self.refresh_tables)
         self.find_in.textChanged.connect(self.refresh_tables)
+        self.find_author_in.textChanged.connect(self.refresh_tables)
 
         self.add_book_btn.clicked.connect(self.add_book_dialog)
         self.add_author_btn.clicked.connect(self.add_author_dialog)
@@ -213,11 +279,13 @@ class BookWidget(QWidget):
         show_tbl(self.book_tbl, book_list, book_head)
 
         author_head = ['id', 'ФИО']
-        author_list = self.root.data.get_authors()
+        author_list = self.root.data.find_authors(self.find_author_in.text())
+        author_list = list(filter(lambda x: x[0] != 0, author_list))
         show_tbl(self.author_tbl, author_list, author_head)
 
         genre_head = ['id', 'ФИО']
         genre_list = self.root.data.get_genres()
+        genre_list = list(filter(lambda x: x[0] != 0, genre_list))
         show_tbl(self.genre_tbl, genre_list, genre_head)
 
     def change_book_list(self, info):
@@ -321,6 +389,14 @@ class BookWidget(QWidget):
         def close():
             self.d.close()
 
+        def delete():
+            dialog = QMessageBox(self.d)
+            ret = dialog.question(self, '', "Удалить книгу из базы данных?", dialog.Yes | dialog.No)
+            if ret == dialog.Yes:
+                self.root.data.delete_book(info[0])
+                self.refresh_tables()
+                self.d.close()
+
         def check():
             index = info[0]
             t = self.d.title_in.text()
@@ -341,6 +417,7 @@ class BookWidget(QWidget):
                         self.d.error.setText('Неверный год')
             else:
                 self.d.error.setText('Не все поля заполнены')
+
         self.d = QDialog()
         uic.loadUi('book_change_dialog.ui', self.d)
 
@@ -355,12 +432,21 @@ class BookWidget(QWidget):
         self.d.year_in.setText(info[4])
 
         self.d.show()
+        self.d.delete_btn.clicked.connect(delete)
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
 
     def change_author_dialog(self, info):
         def close():
             self.d.close()
+
+        def delete():
+            dialog = QMessageBox(self.d)
+            ret = dialog.question(self, '', "Удалить автора из базы данных?", dialog.Yes | dialog.No)
+            if ret == dialog.Yes:
+                self.root.data.delete_author(info[0])
+                self.refresh_tables()
+                self.d.close()
 
         def check():
             index = info[0]
@@ -378,10 +464,19 @@ class BookWidget(QWidget):
         self.d.name_in.setText(info[1])
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
+        self.d.delete_btn.clicked.connect(delete)
 
     def change_genre_dialog(self, info):
         def close():
             self.d.close()
+
+        def delete():
+            dialog = QMessageBox(self.d)
+            ret = dialog.question(self, '', "Удалить жанр из базы данных?", dialog.Yes | dialog.No)
+            if ret == dialog.Yes:
+                self.root.data.delete_genre(info[0])
+                self.refresh_tables()
+                self.d.close()
 
         def check():
             index = info[0]
@@ -399,6 +494,7 @@ class BookWidget(QWidget):
         self.d.genre_in.setText(info[1])
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
+        self.d.delete_btn.clicked.connect(delete)
 
 
 class GiveWidget(QWidget):
@@ -431,6 +527,10 @@ class GiveWidget(QWidget):
 
         self.d = QDialog()
         uic.loadUi('give_give_dialog.ui', self.d)
+        self.d.name_tbl.horizontalHeader().setStretchLastSection(True)
+        head = ['id', 'ФИО']
+        info = self.root.data.find_users('', True)
+        show_tbl(self.d.name_tbl, info, head)
         self.d.show()
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
