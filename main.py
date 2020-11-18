@@ -576,6 +576,7 @@ class GiveWidget(QWidget):
         self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
         self.table.horizontalHeader().setStretchLastSection(True)
         self.refresh_table()
+
         self.give_btn.clicked.connect(self.give_dialog)
         self.get_btn.clicked.connect(self.back_dialog)
 
