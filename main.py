@@ -78,6 +78,8 @@ class Data:
                 SELECT name FROM authors
                 WHERE id = (SELECT author FROM books WHERE id = ?)
         ''', (index, )).fetchone()
+        if not bool(title) or not bool(author):
+            return 0
         return f'{title[0]} ({author[0]})'
 
     def get_authorname(self, index):
@@ -132,6 +134,13 @@ class Data:
                 INSERT INTO genres(id, genre) VALUES(?, ?) 
             ''', (ide, genre,))
 
+    def add_user(self, name):
+        ide = self.cur.execute("select max(id) from users").fetchall()[0][0] + 1
+        self.cur.execute(
+            '''
+                INSERT INTO users(id, name, books) VALUES(?, ?, ?) 
+            ''', (ide, name, 0, ))
+
     def change_book(self, index, title, author, genre, year):
         self.cur.execute('''
                 UPDATE books
@@ -158,7 +167,23 @@ class Data:
                 WHERE id = ?
             ''', (genre, index,))
 
+    def change_user(self, index, name):
+        self.cur.execute('''
+            UPDATE users
+            SET name = ?
+            WHERE id = ?
+        ''', (name, index, ))
+
+    def delete_user(self, index):
+        self.cur.execute('''
+        DELETE FROM users
+        WHERE id = ?''', (index,))
+
     def delete_book(self, index):
+        self.cur.execute('''
+            UPDATE users
+            SET books = 0
+            WHERE books = ?''', (index,))
         self.cur.execute('''
         DELETE FROM books
         WHERE id = ?''', (index, ))
@@ -248,21 +273,26 @@ class Main(QWidget):
     def initUI(self):
         self.widget = QStackedWidget(self)
         main = uic.loadUi('main_widget.ui')
-        book = BookWidget(self)
-        give = GiveWidget(self)
-        users = UsersWidget(self)
+        self.book = BookWidget(self)
+        self.give = GiveWidget(self)
+        self.users = UsersWidget(self)
 
         self.widget.addWidget(main)
-        self.widget.addWidget(book)
-        self.widget.addWidget(give)
-        self.widget.addWidget(users)
+        self.widget.addWidget(self.book)
+        self.widget.addWidget(self.give)
+        self.widget.addWidget(self.users)
 
-        main.find_books.clicked.connect(lambda x: self.widget.setCurrentIndex(1))
-        main.give_books.clicked.connect(lambda x: self.widget.setCurrentIndex(2))
-        main.work.clicked.connect(lambda x: self.widget.setCurrentIndex(3))
+        main.find_books.clicked.connect(lambda: (self.widget.setCurrentIndex(1), self.refresh_tables()))
+        main.give_books.clicked.connect(lambda: (self.widget.setCurrentIndex(2), self.refresh_tables()))
+        main.work.clicked.connect(lambda: (self.widget.setCurrentIndex(3), self.refresh_tables()))
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.widget)
+
+    def refresh_tables(self):
+        self.book.refresh_tables()
+        self.give.refresh_table()
+        self.users.refresh_table()
 
 
 class BookWidget(QWidget):
@@ -276,7 +306,7 @@ class BookWidget(QWidget):
 
     def initUI(self):
         uic.loadUi('book_widget.ui', self)
-        self.back.clicked.connect(lambda x: self.root.widget.setCurrentIndex(0))
+        self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
 
         self.book_tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.author_tbl.horizontalHeader().setStretchLastSection(True)
@@ -432,7 +462,7 @@ class BookWidget(QWidget):
             ret = dialog.question(self, '', "Удалить книгу из базы данных?", dialog.Yes | dialog.No)
             if ret == dialog.Yes:
                 self.root.data.delete_book(info[0])
-                self.refresh_tables()
+                self.root.refresh_tables()
                 self.d.close()
 
         def check():
@@ -449,7 +479,7 @@ class BookWidget(QWidget):
                 else:
                     if 0 < y <= 2020:
                         self.root.data.change_book(index, t, a, g, y)
-                        self.refresh_tables()
+                        self.root.refresh_tables()
                         self.d.close()
                     else:
                         self.d.error.setText('Неверный год')
@@ -543,7 +573,7 @@ class GiveWidget(QWidget):
 
     def initUI(self):
         uic.loadUi('give_widget.ui', self)
-        self.back.clicked.connect(lambda x: self.root.widget.setCurrentIndex(0))
+        self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
         self.table.horizontalHeader().setStretchLastSection(True)
         self.refresh_table()
         self.give_btn.clicked.connect(self.give_dialog)
@@ -651,14 +681,21 @@ class UsersWidget(QWidget):
 
     def initUI(self):
         uic.loadUi('users_widget.ui', self)
-        self.back.clicked.connect(lambda x: self.root.widget.setCurrentIndex(0))
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.refresh_table()
+        self.add_b.clicked.connect(self.add_dialog)
+        self.table.cellDoubleClicked.connect(self.table_change)
+
+    def table_change(self, row, column):
+        selected_user_info = [self.table.item(row, i).text() for i in range(3)]
+        self.change_dialog(selected_user_info)
+
+    def refresh_table(self):
         head = ['id', 'ФИО', 'Книга']
-        info = self.root.data.get_readers(False)
+        info = self.root.data.get_readers(True)
         self.change_info(info)
         show_tbl(self.table, info, head)
-        self.add_b.clicked.connect(self.add_dialog)
-        self.change_b.clicked.connect(self.change_dialog)
 
     def change_info(self, info):
         for i in info:
@@ -672,7 +709,13 @@ class UsersWidget(QWidget):
             self.d.close()
 
         def check():
-            self.d.close()
+            n = self.d.user_name_in.text()
+            if bool(n):
+                self.root.data.add_user(n)
+                self.d.close()
+                self.refresh_table()
+            else:
+                self.d.error.setText('Не все поля заполнены')
 
         self.d = QDialog()
         uic.loadUi('users_add_dialog.ui', self.d)
@@ -680,18 +723,34 @@ class UsersWidget(QWidget):
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
 
-    def change_dialog(self):
+    def change_dialog(self, info):
+        def delete():
+            dialog = QMessageBox(self.d)
+            ret = dialog.question(self, '', "Удалить пользователя из базы данных?", dialog.Yes | dialog.No)
+            if ret == dialog.Yes:
+                self.root.data.delete_user(info[0])
+                self.refresh_table()
+                self.d.close()
+
         def close():
             self.d.close()
 
         def check():
-            self.d.close()
+            n = self.d.user_name_in.text()
+            if bool(n):
+                self.root.data.change_user(info[0], n)
+                self.d.close()
+                self.refresh_table()
+            else:
+                self.d.error.setText('Не все поля заполнены')
 
         self.d = QDialog()
         uic.loadUi('users_change_dialog.ui', self.d)
         self.d.show()
+        self.d.user_name_in.setText(info[1])
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
+        self.d.delete_btn.clicked.connect(delete)
 
 
 def show_tbl(table, info, head):

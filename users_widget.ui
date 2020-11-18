@@ -38,23 +38,9 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="change_b">
-         <property name="text">
-          <string>Изменить</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="add_b">
          <property name="text">
           <string>Добавить</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="delete_b">
-         <property name="text">
-          <string>Удалить</string>
          </property>
         </widget>
        </item>
@@ -69,6 +55,13 @@
      </item>
      <item>
       <widget class="QTableWidget" name="table"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Для редактирования информации нажмите на необходимую ячейку 2 раза</string>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
