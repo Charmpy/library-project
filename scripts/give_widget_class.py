@@ -9,7 +9,7 @@ class GiveWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('give_widget.ui', self)
+        uic.loadUi('UI/give_widget.ui', self)
         self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
         self.table.horizontalHeader().setStretchLastSection(True)
         self.refresh_table()
@@ -56,7 +56,7 @@ class GiveWidget(QWidget):
                 self.d.error.setText('Не все поля заполнены')
 
         self.d = QDialog()
-        uic.loadUi('give_give_dialog.ui', self.d)
+        uic.loadUi('UI/give_give_dialog.ui', self.d)
         self.d.name_tbl.horizontalHeader().setStretchLastSection(True)
         head = ['id', 'ФИО']
         info = self.root.data.find_users('', 1)
@@ -98,7 +98,7 @@ class GiveWidget(QWidget):
                 self.d.error.setText('Выберите пользователя')
 
         self.d = QDialog()
-        uic.loadUi('give_back_dialog.ui', self.d)
+        uic.loadUi('UI/give_back_dialog.ui', self.d)
         head = ['id', 'ФИО', 'книга']
         info = self.root.data.get_readers(True)
         self.change_info(info)

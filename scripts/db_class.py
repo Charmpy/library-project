@@ -3,7 +3,7 @@ import sqlite3
 
 class Data:
     def __init__(self):
-        self.con = sqlite3.connect('library_db.db')
+        self.con = sqlite3.connect('database/library_db.db')
         self.cur = self.con.cursor()
 
     def find_authors(self, line):
@@ -115,6 +115,7 @@ class Data:
                 ?
                 ) 
             ''', (ide, title, author, genre, year, ))
+        self.con.commit()
 
     def add_author(self, name):
         ide = self.cur.execute("select max(id) from authors").fetchall()[0][0] + 1
@@ -122,6 +123,7 @@ class Data:
             '''
                 INSERT INTO authors(id, name) VALUES(?, ?) 
             ''', (ide, name,))
+        self.con.commit()
 
     def add_genre(self, genre):
         ide = self.cur.execute("select max(id) from genres").fetchall()[0][0] + 1
@@ -129,6 +131,7 @@ class Data:
             '''
                 INSERT INTO genres(id, genre) VALUES(?, ?) 
             ''', (ide, genre,))
+        self.con.commit()
 
     def add_user(self, name):
         ide = self.cur.execute("select max(id) from users").fetchall()[0][0] + 1
@@ -136,6 +139,7 @@ class Data:
             '''
                 INSERT INTO users(id, name, books) VALUES(?, ?, ?) 
             ''', (ide, name, 0, ))
+        self.con.commit()
 
     def change_book(self, index, title, author, genre, year):
         self.cur.execute('''
@@ -146,6 +150,7 @@ class Data:
                 year = ?
                 WHERE id = ?
             ''', (title, author, genre, year, index,))
+        self.con.commit()
 
     def change_author(self, index, name):
         self.cur.execute(
@@ -154,6 +159,7 @@ class Data:
                 SET name = ?
                 WHERE id = ?
             ''', (name, index,))
+        self.con.commit()
 
     def change_genre(self, index, genre):
         self.cur.execute(
@@ -162,6 +168,7 @@ class Data:
                 SET genre = ?
                 WHERE id = ?
             ''', (genre, index,))
+        self.con.commit()
 
     def change_user(self, index, name):
         self.cur.execute('''
@@ -169,11 +176,13 @@ class Data:
             SET name = ?
             WHERE id = ?
         ''', (name, index, ))
+        self.con.commit()
 
     def delete_user(self, index):
         self.cur.execute('''
         DELETE FROM users
         WHERE id = ?''', (index,))
+        self.con.commit()
 
     def delete_book(self, index):
         self.cur.execute('''
@@ -183,6 +192,7 @@ class Data:
         self.cur.execute('''
         DELETE FROM books
         WHERE id = ?''', (index, ))
+        self.con.commit()
 
     def delete_author(self, index):
         self.cur.execute(
@@ -194,6 +204,7 @@ class Data:
         self.cur.execute('''
         DELETE FROM authors
         WHERE id = ?''', (index, ))
+        self.con.commit()
 
     def delete_genre(self, index):
         self.cur.execute(
@@ -205,6 +216,7 @@ class Data:
         self.cur.execute('''
         DELETE FROM genres
         WHERE id = ?''', (index, ))
+        self.con.commit()
 
     def find_users(self, line, flag=''):
         if flag == 1:
@@ -250,6 +262,7 @@ class Data:
                 )
             WHERE name = ?
             ''', (book_title, book_author, user_name, ))
+        self.con.commit()
 
     def back_book(self, user_name):
         self.cur.execute(
@@ -258,4 +271,4 @@ class Data:
             SET books = 0
             WHERE name LIKE ?
             ''', (user_name, ))
-
+        self.con.commit()

@@ -13,7 +13,7 @@ class BookWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('book_widget.ui', self)
+        uic.loadUi('UI/book_widget.ui', self)
         self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
 
         self.book_tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -94,7 +94,7 @@ class BookWidget(QWidget):
                 self.d.error.setText('Не все поля заполнены')
 
         self.d = QDialog()
-        uic.loadUi('book_add_dialog.ui', self.d)
+        uic.loadUi('UI/book_add_dialog.ui', self.d)
         authors = [i[1] for i in self.root.data.get_authors()]
         genres = [i[1] for i in self.root.data.get_genres()]
         self.d.author_combo.addItems(authors)
@@ -124,7 +124,7 @@ class BookWidget(QWidget):
             show_tbl(self.d.author_tbl, info, ['id', 'Автор'])
 
         self.d = QDialog()
-        uic.loadUi('book_add_author_dialog.ui', self.d)
+        uic.loadUi('UI/book_add_author_dialog.ui', self.d)
         self.d.show()
         self.d.author_tbl.horizontalHeader().setStretchLastSection(True)
         update_tbl('')
@@ -153,7 +153,7 @@ class BookWidget(QWidget):
             show_tbl(self.d.genre_tbl, info, ['id', 'Жанр'])
 
         self.d = QDialog()
-        uic.loadUi('book_add_genre_dialog.ui', self.d)
+        uic.loadUi('UI/book_add_genre_dialog.ui', self.d)
         self.d.show()
         self.d.genre_tbl.horizontalHeader().setStretchLastSection(True)
         update_tbl('')
@@ -195,7 +195,7 @@ class BookWidget(QWidget):
                 self.d.error.setText('Не все поля заполнены')
 
         self.d = QDialog()
-        uic.loadUi('book_change_dialog.ui', self.d)
+        uic.loadUi('UI/book_change_dialog.ui', self.d)
 
         authors = [i[1] for i in self.root.data.get_authors()]
         genres = [i[1] for i in self.root.data.get_genres()]
@@ -235,7 +235,7 @@ class BookWidget(QWidget):
                 self.d.error.setText('Заполните поле')
 
         self.d = QDialog()
-        uic.loadUi('book_change_author_dialog.ui', self.d)
+        uic.loadUi('UI/book_change_author_dialog.ui', self.d)
         self.d.show()
         self.d.name_in.setText(info[1])
         self.d.cancel_btn.clicked.connect(close)
@@ -265,7 +265,7 @@ class BookWidget(QWidget):
                 self.d.error.setText('Заполните поле')
 
         self.d = QDialog()
-        uic.loadUi('book_change_genre_dialog.ui', self.d)
+        uic.loadUi('UI/book_change_genre_dialog.ui', self.d)
         self.d.show()
         self.d.genre_in.setText(info[1])
         self.d.cancel_btn.clicked.connect(close)

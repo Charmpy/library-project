@@ -10,7 +10,7 @@ class UsersWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('users_widget.ui', self)
+        uic.loadUi('UI/users_widget.ui', self)
         self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
         self.table.horizontalHeader().setStretchLastSection(True)
         self.refresh_table()
@@ -48,7 +48,7 @@ class UsersWidget(QWidget):
                 self.d.error.setText('Не все поля заполнены')
 
         self.d = QDialog()
-        uic.loadUi('users_add_dialog.ui', self.d)
+        uic.loadUi('UI/users_add_dialog.ui', self.d)
         self.d.show()
         self.d.cancel_btn.clicked.connect(close)
         self.d.ok_btn.clicked.connect(check)
@@ -75,7 +75,7 @@ class UsersWidget(QWidget):
                 self.d.error.setText('Не все поля заполнены')
 
         self.d = QDialog()
-        uic.loadUi('users_change_dialog.ui', self.d)
+        uic.loadUi('UI/users_change_dialog.ui', self.d)
         self.d.show()
         self.d.user_name_in.setText(info[1])
         self.d.cancel_btn.clicked.connect(close)

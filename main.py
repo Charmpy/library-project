@@ -18,7 +18,7 @@ class Main(QWidget):
 
     def initUI(self):
         self.widget = QStackedWidget(self)
-        main = uic.loadUi('main_widget.ui')
+        main = uic.loadUi('UI/main_widget.ui')
         self.book = BookWidget(self)
         self.give = GiveWidget(self)
         self.users = UsersWidget(self)
