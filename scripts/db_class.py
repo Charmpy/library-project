@@ -4,6 +4,7 @@ import sqlite3
 class Data:
     def __init__(self):
         self.con = sqlite3.connect('database/library_db.db')
+        self.con.execute('PRAGMA foreign_keys = 1')
         self.cur = self.con.cursor()
 
     def find_authors(self, line):
@@ -185,10 +186,6 @@ class Data:
         self.con.commit()
 
     def delete_book(self, index):
-        self.cur.execute('''
-            UPDATE users
-            SET books = 0
-            WHERE books = ?''', (index,))
         self.cur.execute('''
         DELETE FROM books
         WHERE id = ?''', (index, ))
