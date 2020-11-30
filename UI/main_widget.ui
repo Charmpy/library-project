@@ -73,7 +73,7 @@ border-image: url(:/newPrefix/wallpaper.png);
           <string notr="true"/>
          </property>
          <property name="text">
-          <string>ПРИЛОЖЕНИЕ ДЛЯ РАБОТЫ БИБИЛИОТЕКИ</string>
+          <string>ПРИЛОЖЕНИЕ ДЛЯ РАБОТЫ БИБЛИОТЕКИ</string>
          </property>
         </widget>
        </item>
@@ -289,8 +289,6 @@ border-image: url(:/newPrefix/wallpaper.png);
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="test2.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
