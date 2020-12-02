@@ -23,7 +23,7 @@ class UsersWidget(QWidget):
 
     def refresh_table(self):
         head = ['id', 'ФИО', 'Книга']
-        info = self.root.data.get_readers(True)
+        info = self.root.data.get_readers(False)
         self.change_info(info)
         show_tbl(self.table, info, head)
 
