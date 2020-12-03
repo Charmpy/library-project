@@ -35,12 +35,12 @@ class Data:
         if head == 'author':
             rez = self.cur.execute(
                 '''SELECT * FROM books
-                    WHERE id > 0 AND author IN (SELECT id from authors WHERE name LIKE ?)
+        WHERE id > 0 AND author IN (SELECT id from authors WHERE name LIKE ?)
                 ''', (f'%{line}%', )).fetchall()
         elif head == 'genre':
             rez = self.cur.execute(
                 '''SELECT * FROM books
-                    WHERE id > 0 AND genre IN (SELECT id from genres WHERE genre LIKE ?)
+        WHERE id > 0 AND genre IN (SELECT id from genres WHERE genre LIKE ?)
                 ''', (f'%{line}%',)).fetchall()
         elif head == 'title':
             rez = self.cur.execute(
@@ -106,7 +106,9 @@ class Data:
         return [list(i) for i in rez]
 
     def add_book(self, title, author, genre, year):
-        ide = self.cur.execute("select max(id) from books").fetchall()[0][0] + 1
+        ide = self.cur.execute(
+            "select max(id) from books"
+        ).fetchall()[0][0] + 1
         self.cur.execute(
             '''
                 INSERT INTO books(id, title, author, genre, year) VALUES(
@@ -119,7 +121,9 @@ class Data:
         self.con.commit()
 
     def add_author(self, name):
-        ide = self.cur.execute("select max(id) from authors").fetchall()[0][0] + 1
+        ide = self.cur.execute(
+            "select max(id) from authors"
+        ).fetchall()[0][0] + 1
         self.cur.execute(
             '''
                 INSERT INTO authors(id, name) VALUES(?, ?) 
@@ -127,7 +131,9 @@ class Data:
         self.con.commit()
 
     def add_genre(self, genre):
-        ide = self.cur.execute("select max(id) from genres").fetchall()[0][0] + 1
+        ide = self.cur.execute(
+            "select max(id) from genres"
+        ).fetchall()[0][0] + 1
         self.cur.execute(
             '''
                 INSERT INTO genres(id, genre) VALUES(?, ?) 
@@ -135,7 +141,9 @@ class Data:
         self.con.commit()
 
     def add_user(self, name):
-        ide = self.cur.execute("select max(id) from users").fetchall()[0][0] + 1
+        ide = self.cur.execute(
+            "select max(id) from users"
+        ).fetchall()[0][0] + 1
         self.cur.execute(
             '''
                 INSERT INTO users(id, name, books) VALUES(?, ?, ?) 
@@ -242,7 +250,9 @@ class Data:
             '''
             SELECT id FROM users
             WHERE books = (
-                SELECT id FROM books WHERE title LIKE ? AND author = (SELECT id FROM authors WHERE name LIKE ?)
+            SELECT id FROM books WHERE title LIKE ? AND author = (
+            SELECT id FROM authors WHERE name LIKE ?
+            )
             )
             ''', (book_title, book_author,)).fetchall()
         if rez:
@@ -255,7 +265,9 @@ class Data:
             UPDATE users
             SET books = (
                 SELECT id FROM books 
-                WHERE title LIKE ? AND author = (SELECT id FROM authors WHERE name LIKE ?)
+                WHERE title LIKE ? AND author = (
+                SELECT id FROM authors WHERE name LIKE ?
+                )
                 )
             WHERE name = ?
             ''', (book_title, book_author, user_name, ))

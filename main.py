@@ -29,9 +29,15 @@ class Main(QWidget):
         self.widget.addWidget(self.give)
         self.widget.addWidget(self.users)
 
-        main.find_books.clicked.connect(lambda: (self.widget.setCurrentIndex(1), self.refresh_tables()))
-        main.give_books.clicked.connect(lambda: (self.widget.setCurrentIndex(2), self.refresh_tables()))
-        main.work.clicked.connect(lambda: (self.widget.setCurrentIndex(3), self.refresh_tables()))
+        main.find_books.clicked.connect(
+            lambda: (self.widget.setCurrentIndex(1), self.refresh_tables())
+        )
+        main.give_books.clicked.connect(
+            lambda: (self.widget.setCurrentIndex(2), self.refresh_tables())
+        )
+        main.work.clicked.connect(
+            lambda: (self.widget.setCurrentIndex(3), self.refresh_tables())
+        )
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.widget)

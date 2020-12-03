@@ -10,7 +10,11 @@ class GiveWidget(QWidget):
 
     def initUI(self):
         uic.loadUi('UI/give_widget.ui', self)
-        self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
+        self.back.clicked.connect(
+            lambda: (
+                self.root.widget.setCurrentIndex(0), self.root.refresh_tables()
+            )
+        )
         self.table.horizontalHeader().setStretchLastSection(True)
         self.refresh_table()
 
@@ -27,7 +31,10 @@ class GiveWidget(QWidget):
             show_tbl(self.d.name_tbl, info, head)
 
         def chose_user(x, y):
-            info = [self.d.name_tbl.item(x, 0).text(), self.d.name_tbl.item(x, 1).text()]
+            info = [
+                self.d.name_tbl.item(x, 0).text(),
+                self.d.name_tbl.item(x, 1).text()
+            ]
             self.d.name_tbl.setDisabled(True)
             self.d.user_name.setText(info[1])
 
@@ -84,7 +91,9 @@ class GiveWidget(QWidget):
             self.d.close()
 
         def chose_user(x, y):
-            self.out_info = [self.d.name_tbl.item(x, i).text() for i in range(3)]
+            self.out_info = [
+                self.d.name_tbl.item(x, i).text() for i in range(3)
+            ]
             self.d.user_name.setText(self.out_info[1])
             self.d.book_title.setText(self.out_info[2])
 

@@ -14,9 +14,15 @@ class BookWidget(QWidget):
 
     def initUI(self):
         uic.loadUi('UI/book_widget.ui', self)
-        self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
+        self.back.clicked.connect(
+            lambda: (
+                self.root.widget.setCurrentIndex(0), self.root.refresh_tables()
+            )
+        )
 
-        self.book_tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.book_tbl.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch
+        )
         self.author_tbl.horizontalHeader().setStretchLastSection(True)
         self.genre_tbl.horizontalHeader().setStretchLastSection(True)
         self.refresh_tables()
@@ -36,19 +42,27 @@ class BookWidget(QWidget):
         self.genre_tbl.cellDoubleClicked.connect(self.change_genre_coords)
 
     def change_book_coords(self, row, col):
-        selected_book_info = [self.book_tbl.item(row, i).text() for i in range(5)]
+        selected_book_info = [
+            self.book_tbl.item(row, i).text() for i in range(5)
+        ]
         self.change_book_dialog(selected_book_info)
 
     def change_author_coords(self, row, col):
-        selected_author_info = [self.author_tbl.item(row, i).text() for i in range(2)]
+        selected_author_info = [
+            self.author_tbl.item(row, i).text() for i in range(2)
+        ]
         self.change_author_dialog(selected_author_info)
 
     def change_genre_coords(self, row, col):
-        selected_genre_info = [self.genre_tbl.item(row, i).text() for i in range(2)]
+        selected_genre_info = [
+            self.genre_tbl.item(row, i).text() for i in range(2)
+        ]
         self.change_genre_dialog(selected_genre_info)
 
     def refresh_tables(self):
-        book_list = self.root.data.get_books(self.find_combo.currentIndex(), self.find_in.text())
+        book_list = self.root.data.get_books(
+            self.find_combo.currentIndex(), self.find_in.text()
+        )
 
         book_head = ['id', 'Название', 'Автор', 'Жанр', 'Год']
         self.change_book_list(book_list)
@@ -167,7 +181,10 @@ class BookWidget(QWidget):
 
         def delete():
             dialog = QMessageBox(self.d)
-            ret = dialog.question(self, '', "Удалить книгу из базы данных?", dialog.Yes | dialog.No)
+            ret = dialog.question(
+                self, '', "Удалить книгу из базы данных?",
+                dialog.Yes | dialog.No
+            )
             if ret == dialog.Yes:
                 self.root.data.delete_book(info[0])
                 self.root.refresh_tables()
@@ -218,7 +235,9 @@ class BookWidget(QWidget):
 
         def delete():
             dialog = QMessageBox(self.d)
-            ret = dialog.question(self, '', "Удалить автора из базы данных?", dialog.Yes | dialog.No)
+            ret = dialog.question(
+                self, '', "Удалить автора из базы данных?",
+                dialog.Yes | dialog.No)
             if ret == dialog.Yes:
                 self.root.data.delete_author(info[0])
                 self.refresh_tables()
@@ -248,7 +267,9 @@ class BookWidget(QWidget):
 
         def delete():
             dialog = QMessageBox(self.d)
-            ret = dialog.question(self, '', "Удалить жанр из базы данных?", dialog.Yes | dialog.No)
+            ret = dialog.question(
+                self, '', "Удалить жанр из базы данных?",
+                dialog.Yes | dialog.No)
             if ret == dialog.Yes:
                 self.root.data.delete_genre(info[0])
                 self.refresh_tables()

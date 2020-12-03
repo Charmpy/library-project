@@ -11,7 +11,11 @@ class UsersWidget(QWidget):
 
     def initUI(self):
         uic.loadUi('UI/users_widget.ui', self)
-        self.back.clicked.connect(lambda: (self.root.widget.setCurrentIndex(0), self.root.refresh_tables()))
+        self.back.clicked.connect(
+            lambda: (
+                self.root.widget.setCurrentIndex(0), self.root.refresh_tables()
+            )
+        )
         self.table.horizontalHeader().setStretchLastSection(True)
         self.refresh_table()
         self.add_b.clicked.connect(self.add_dialog)
@@ -56,7 +60,10 @@ class UsersWidget(QWidget):
     def change_dialog(self, info):
         def delete():
             dialog = QMessageBox(self.d)
-            ret = dialog.question(self, '', "Удалить пользователя из базы данных?", dialog.Yes | dialog.No)
+            ret = dialog.question(
+                self, '', "Удалить пользователя из базы данных?",
+                dialog.Yes | dialog.No
+            )
             if ret == dialog.Yes:
                 self.root.data.delete_user(info[0])
                 self.refresh_table()
